@@ -233,7 +233,106 @@ def call_agent(prompt, system_prompt, tools, plan):
     return messages[-1]["content"]
 
 
+    # step 1: run agent to do website search
+def website_search(entity_name: str, website: str):
+    tools = [
+        {
+            "type": "function",
+            "function": {
+                "name": "scrape",
+                "description": "Scrape a URL for information",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "url": {
+                            "type": "string",
+                            "description": "the url of the website to scrape",
+                        },
+                    },
+                    "required": ["url"],
+                },
+            },
+        },
+        {
+            "type": "function",
+            "function": {
+                "name": "update_data",
+                "description": "Save data points found for later retrieval",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "datas_update": {
+                            "type": "array",
+                            "description": "the data points to update",
+                            "items": {
+                                "type": "object",
+                                "description": "the data point to update, should follow specific json format: {name: xxx, value: yyy}",
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "description": "the name of the data point",
+                                    },
+                                    "value": {
+                                        "type": "string",
+                                        "description": "the value of the data point",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                    "required": ["datas_update"],
+                },
+            },
+        }
+    ]
 
+    data_keys_to_search = [obj["name"] for obj in data_points if obj["value"] is None]
+
+    if len(data_keys_to_search) > 0:
+        system_prompt = """
+    You are a world-class web researcher.
+    You will keep scraping URLs based on information you received until information is found.
+
+    You will try as hard as possible to search for all sorts of different queries & sources to find information.
+    You do not stop until all information is found, it is very important we find all information, I will guide you.
+    Whenever you find a certain data point, use the "update_data" function to save the data point.
+
+    You only answer questions based on results from the scraper, do not make things up.
+    You never ask the user for inputs or permissions, you just do your job and provide the results.
+    You ONLY run 1 function at a time, do NEVER run multiple functions at the same time.
+    """
+
+    prompt = f"""
+    Entity to search: {entity_name}
+
+    Links we already scraped: {links_scraped}
+   
+    Data points to find:
+    {data_keys_to_search}
+"""
+
+    response = call_agent(prompt, system_prompt, tools, plan=False)
+
+    return response
+
+    links_scraped = []
+
+    data_points = [
+        {"name": "catering_offering_for_employees", "value": None, "reference": None},
+        {"name": "num_employees", "value": None, "reference": None},
+        {"name": "office_locations", "value": None, "reference": None},
+]
+
+    entity_name = "Discord"
+    website = "https://discord.com/"
+
+    response1 = website_search(entity_name, website)
+    response2 = internet_search(entity_name)
+
+    print("------")
+    print(f"Data points found: {data_points}")
+
+# Assuming 'entity_name' and 'links_scraped' are already defined elsewhere in your code
 
 
 
