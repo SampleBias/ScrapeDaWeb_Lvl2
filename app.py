@@ -160,32 +160,6 @@ def memory_optimise(messages: list):
         system_prompt = f"""{system_prompt}; Here is a summary of past actions taken so far: {response.choices[0].message.content}"""
         messages = [{"role": "system", "content": system_prompt}] + latest_messages
 
-        return messages
-    
-def call_agent(prompt, system_prompt, tools, plan):
-    messages = []
-
-    if plan:
-        messages.append(
-            {
-                "role": "user",
-                "content": (
-                    system_prompt
-                    + " "
-                    + prompt
-                    + " Let's think step by step, make a plan first"
-                ),
-            }
-        )
-        print(messages)
-        chat_response = chat_completion_request(
-            messages, tool_choice="none", tools=tools
-        )
-        print(chat_response.choices[0].message.content)
-        messages = [
-            {"role": "user", "content": (system_prompt + " " + prompt)},
-            {"role": "assistant", "content": chat_response.choices[0].message.content},
-        ]
     else:
         messages.append({"role": "user", "content": (system_prompt + " " + prompt)})
 
