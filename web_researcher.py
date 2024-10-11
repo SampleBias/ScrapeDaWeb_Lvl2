@@ -10,8 +10,8 @@ from termcolor import colored
 import requests
 
 # TEMPORARY: Direct API key setting (remove this in production)
-os.environ["OPENAI_API_KEY"] = "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"  # Replace with your actual OpenAI API key
-os.environ["FIRECRAWL_API_KEY"] = "fc-2644a0521b00476b9ae58d195df7caf3"  # Replace with your actual Firecrawl API key
+os.environ["OPENAI_API_KEY"] = "Add API Key"  # Replace with your actual OpenAI API key
+os.environ["FIRECRAWL_API_KEY"] = "add API key"  # Replace with your actual Firecrawl API key
 print("WARNING: API keys are set directly in the code. This is for testing only. Remove before production use.")
 
 # Load environment variables (this will use the keys we just set)
